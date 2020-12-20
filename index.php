@@ -1,3 +1,13 @@
+<?php
+    session_start();
+    if(!isset($_SESSION['admin'])){
+        $_SESSION = array();
+        header("Location: login.php");
+        exit();
+    }
+?>
+
+
 <!DOCTYPE html>
 
 <head>
@@ -40,7 +50,6 @@
         $delete = $_GET['delete'];
         $get = true;
         $id_get = $_GET['id'];
-        echo "delete wysłany";
     }
 
     if (isset($_POST["posiedzenie"])){ 
@@ -209,11 +218,9 @@
     if($delete==1){
         $conn = get_connection();
         $updateqry = "UPDATE posiedzenia SET processed = 0 WHERE id = ?";
-        echo "aktuLIZUJĘ wiersz $id_get";
         if($stmt = $conn->prepare($updateqry)){
             $stmt->bind_param('i', $id_get);
             $stmt->execute();
-            echo "zaktualizowano $id";
         }
     }
     //create placeholder
