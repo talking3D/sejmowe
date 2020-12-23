@@ -62,7 +62,7 @@
       </label>
     </div> -->
             <button class="w-100 btn btn-lg btn-primary" type="submit">Zaloguj</button>
-            <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
+            <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
         </form>
     </main>
     <?php

@@ -24,7 +24,6 @@
             #1
             $query = "SELECT userid, password, first_name, user_level FROM users WHERE email = ?";
             if($stmt = $conn->prepare($query)){
-                echo "pociecho";
                 $stmt->bind_param('s', $email);
                 $stmt->execute();
                 if($stmt->bind_result($userid, $pass, $first_name, $user_level)){
@@ -36,21 +35,21 @@
                 if($res==1){
                     if(password_verify($password, $pass)){
                         session_start();
-                        $_SESSION['admin'] = 1;
-                    }
-                    header('Location: ' . 'index.php');
+                        $_SESSION['user'] = $userid;
+                        header('Location: ' . 'index.php');
+                    
                     // Make the browser load either the members or the admin page
                 } else { // No password match was made. #4 
                     $errors[] = 'Podane e-mail lub hasło są nieprawidłowe. ';
                 }
-            }
+            } else{ 
+                $errors[] = 'Podany użytkownik nie występuje w naszej bazie.';
             }
         if (!empty($errors)) {
-            $errorstring = "Wystąpił błąd <br />:<br>"; 
+            $errorstring = "<strong>Wystąpił błąd:<br/></strong>"; 
             foreach ($errors as $msg) { // Print each error.
                 $errorstring .= " $msg<br>\n";
             }
-            $errorstring .= "Prosimy spróbować później.<br>";
             echo "<div class='alert alert-warning' role='alert'>";
             echo "<p class=' text-center' style='color:red'>$errorstring</p></div>";
 
@@ -58,6 +57,8 @@
         $stmt->free_result();
         $stmt->close();
     }
+}
+        }
  catch(Exception $e) {// We finally handle any problems here
     // print "An Exception occurred. Message: " . $e->getMessage(); 
     print "System jest w tej chwili zajęty, prosimy spróbować później.";

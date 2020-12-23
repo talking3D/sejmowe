@@ -19,4 +19,12 @@
         print("Taki błąd nie wynika stąd - ". $e->getMessage());
     
     }
+    function get_connection(){
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        if($conn->connect_error){
+            die("Niestety połącznie nie powiodło się. Prosimy o kontakt z administratorem");
+        } else {
+            return $conn;
+        }
+    }
 ?>

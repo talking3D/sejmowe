@@ -1,10 +1,12 @@
 <?php
     session_start();
-    if(!isset($_SESSION['admin'])){
+    if(!isset($_SESSION['user'])){
         $_SESSION = array();
         header("Location: login.php");
         exit();
     }
+    require("mysqli_connect.php");
+    require("functions.php");
 ?>
 
 
@@ -23,19 +25,12 @@
         integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous">
     </script>
     <?php 
-    function get_connection(){
-        $conn = new mysqli('localhost', 'root', 'rootR98&5', 'sejm_kopia');
-        if($conn->connect_error){
-            die("Niestety połącznie nie powiodło się. Prosimy o kontakt z administratorem");
-        } else {
-            return $conn;
-        }
-    }
+    
     function sanitize_filter($post_val){
         return filter_var($post_val, FILTER_SANITIZE_STRING);
     }
 
-    //$conn = get_connection();
+    $conn = get_connection();
     if(!isset($processed)){$processed = 1;};
     if(!isset($_GET['strona'])){
         $page = 1;
@@ -69,12 +64,14 @@
 
     } elseif($processed == 2) {
         $join = '';
-        $processed = '';
+        //$processed = '';
     } else {
         $join = 'LEFT';
     }
     ?>
     <div class="container">
+    <?php include "header.php"; ?>
+        
         <form class="form-floating" id="search" action="index.php" method="POST">
             <div class="row align-items-center py-2">
                 <div class="col-1 form-floating g-2">
@@ -100,10 +97,10 @@
                     <label for="top" class="form-label">Słowa kluczowe</label>
                 </div>
                 <div class="col-2">
-                    <select class="form-select form-select-sm" aria-label=".form-select-sm example" name="include">
-                        <option value="0" <?php echo ($processed_to_form == 0 ? " selected" : "");?>>Wszystkie</option>
-                        <option value="1" <?php echo ($processed_to_form == 1 ? " selected" : "");?>>Istotne</option>
-                        <option value="2" <?php echo($processed_to_form == 2 ? " selected" : "");?>>Sentyment</option>
+                    <select class="form-select" aria-label=".form-select-example" name="include">
+                        <option value="0" <?php echo ($processed_to_form == 0 ? " selected" : "");?>>wszystkie</option>
+                        <option value="1" <?php echo ($processed_to_form == 1 ? " selected" : "");?>>istotne</option>
+                        <option value="2" <?php echo($processed_to_form == 2 ? " selected" : "");?>>sentyment</option>
                     </select>
                 </div>
                 <div class="col-1">
@@ -130,9 +127,9 @@
         }
 
         function get_status($sentyment, $temat, $processed) {
-            if($sentyment > 9 || (isset($temat) && $temat !=='' && (!isset($sentyment) || $sentyment === '' )) || (!isset($temat) && isset($sentyment) && $sentyment !== '')){
+            if($sentyment > 1 || (isset($temat) && $temat !=='' && (!isset($sentyment) || $sentyment === '' )) || (!isset($temat) && isset($sentyment) && $sentyment !== '')){
                 return -1;
-            } elseif($processed === 1 && isset($sentyment)) {
+            } elseif(($processed === 1  || $processed === 2) && isset($sentyment)) {
                 return 1;
             }  elseif($processed === 1){
                 return 0;
@@ -149,11 +146,7 @@
     
     
     if($post || $get){
-    // mysqli
-    // $conn = new mysqli("localhost", "root", "rootR98&5", "sejm_kopia");
-    // if($conn -> connect_error) {
-    //     die("Connection failed" . $conn->connect_error . " " . $time_now . ")");
-    // }
+
     $params = array(
         'posiedzenie' => $posiedzenie, 
         'YEAR(data)' =>$year, 
@@ -163,11 +156,11 @@
         'processed' => $processed,
         //'delete' => $delete    
     );
-
+    //$params['processed'] == 2 ? $params['processed'] = 1 : $params;
+    //echo "paramsy: ". $params['processed'];
     function query_constructor($params, $limit, $page, $join = 'LEFT'){
         $where = '';
         foreach($params as $param => $value){
-            //if($param == 'delete'){continue;}
             if (in_array($param, array("YEAR(data)", "kto", "p.tekst", "top"))){
                 $param_clause = $param . " like ?";
             } elseif($value == '') {
@@ -190,8 +183,12 @@
     }
     //echo query_constructor($params, $limit, $page, $join);
     
+    
     function parse_params($params) {
         $values = array();
+        if($params['processed'] == 2){
+            $params['processed'] = 1;
+        }
         foreach($params as $param=>$value) {
             if($param == 'delete'){continue;}
             if (in_array($param, array("YEAR(data)", "kto", "p.tekst", "top")) OR $value == ''){
@@ -244,11 +241,11 @@
             return $text;
         }
         }
-    function print_status($sentyment, $temat, $sent_tekst, $processed) {
-        if($sentyment > 9 || ($temat != '' && $sentyment === '') || ($temat ==='' && $sentyment != '')){
+    function print_status($sentyment, $temat, $processed) {
+        if($sentyment > 1 || ($temat !== '' && $sentyment === '') || ($temat ==='' && $sentyment !== '')){
             return "<span class='text-danger'><svg class='bi' width='24' height='24' fill='currentColor'><use xlink:href='bootstrap-icons.svg#exclamation-circle-fill'/><span>";
         }
-        if($processed == 1 && $sentyment != '') {
+        if(($processed == 1 || $processed == 2) && !is_null($sentyment)) {
             return "<span class='text-success'><svg class='bi' width='24' height='24' fill='currentColor'><use xlink:href='bootstrap-icons.svg#chat-text-fill'/><span>";
         } 
         if($processed == 1){
@@ -266,91 +263,40 @@
         return $pags;
     }
 
-    function get_param_link($params){
-        $param_link = '';
-        foreach($params as $param => $value){
-            ($param == 'YEAR(data)') ? $param = "year" : $param;
-            if($param_link == ''){
-                $param_link = $param . "=". $value;
-            } else {
-                $param_link = $param_link . "&" . $param . "=" . $value;
-            }
-        }
-        return $param_link;
-    }
-
-
-    function make_pagination($page=0, $count, $limit=20, $params){
-        $pages = ceil($count/$limit);
-        $active_page = $page;
-        $last_page = $pages;
-        $prev_page = $page - 1;
-        $next_page = $page + 1;
     
-        $param_link = get_param_link($params);
-    
-        echo "<nav aria-label='Nawigacja'><ul class='pagination pagination-sm justify-content-center'>";
-        //pierwszy przycisk paginacji
-        echo "<li class='page-item ". (($page == 1) ? "disabled" : "") ."'><a class='page-link' href='?".$param_link."&strona=". $prev_page."' tabindex='-1' aria-disabled='true'>Poprzednia</a></li>";
-        //środek paginacji
-        
-        $max_cells = ($pages <= 9 ? $pages : 9);
-        if($pages <=9){
-            for($r=1; $r<$max_cells; $r++){
-                echo "<li class='page-item ".(($r == $active_page) ? " active" : "")."'><a class='page-link' href='?". $param_link ."&strona=". $r ."'>". $r ."</a></li>";
-            }
-        } elseif($page < 5 || $page > ($pages - 4)) {
-            echo "<li class='page-item ".(($active_page == 1) ? " active" : "")."'><a class='page-link' href='?". $param_link ."&strona=1'>1</a></li>";  
-            for($page_item = 2; $page_item<6; $page_item++){
-                echo "<li class='page-item ".(($page_item == $active_page) ? " active" : "")."'><a class='page-link' href='?". $param_link ."&strona=". $page_item ."'>". $page_item ."</a></li>";
-            }
-            echo "<li class='page-item disabled'><a class='page-link' href='#'>...</a></li>";
-            for($page_item = $pages-4; $page_item < $pages; $page_item++){
-                echo "<li class='page-item ".(($page_item == $active_page) ? " active" : "")."'><a class='page-link' href='?". $param_link ."&strona=". $page_item ."'>". $page_item ."</a></li>";
-            }
-            
-        } else {
-            echo "<li class='page-item'><a class='page-link' href='?". $param_link ."&strona=1'>1</a></li>";
-            echo "<li class='page-item disabled'><a class='page-link' href='#'>...</a></li>";
-            $midpages = get_mid_pages($page);
-            foreach($midpages as $page_item){
-                echo "<li class='page-item ".(($page_item == $active_page) ? " active" : "")."'><a class='page-link' href='?". $param_link ."&strona=". $page_item ."'>". $page_item ."</a></li>";
-            }
-            echo "<li class='page-item disabled'><a class='page-link' href='#'>...</a></li>";
-        }
-            echo "<li class='page-item ".(($active_page == $last_page) ? " active" : "")."'><a class='page-link' href='?". $param_link ."&strona=". $last_page ."'>". $last_page ."</a></li>";
-        echo "<li class='page-item ". (($page == $last_page) ? "disabled" : "") ."'><a class='page-link' href='?". $param_link ."&strona=". $next_page."'>Następna</a></li>";
-        echo "</ul></nav>";
-    }
-   
 
+    
     make_pagination($page, $count, $limit, $params);
     $param_link = get_param_link($params);
-    echo ("<table class='table table-hover caption-top'>
+    ?>
+    <div class="container border border-1 rounded">
+    <?php
+    echo ("<table class='table table-striped table-hover'>
         <thead>
-            <tr>
-                <th scope='col'>S</th>
-                <th scope='col'>data</th>
-                <th scope='col'>posiedz</th>
-                <th scope='col'>kto</th>
-                <th scope='col-2'>tekst</th>
-                <th scope='col-3'>kluczowe</th>
-                <th scope='col-3'>akcja</th>
+            <tr class='text-center'>
+                <th>S</th>
+                <th>data</th>
+                <th>posiedz</th>
+                <th>kto</th>
+                <th>tekst</th>
+                <th>kluczowe</th>
+                <th colspan=2>akcja</th>
             </tr>
             </thead>
         <tbody>");
     while($stmt->fetch()){
-        echo ("<tr ". ($processed != 1 ? ("class='text-secondary'"): ("") ).">
-                <th scope='row' class='align-middle'>" . print_status($sentyment, $temat, $sent_tekst, $processed) . "</th>
-                <td class='col-2'><p class='fw-light'>" . $data . "</p></td>
-                <td><p class='fw-light'>" . $posiedzenie . "</p></td>
-                <td class='col-2'>" . $kto . "</td><td class='col-5'>" . text_limit($tekst, 300) . "</td>
+        echo ("<tr ". ($processed != 1 ? ("class='text-secondary'") : ("") ).">
+                <th scope='row' class='align-middle'>" . print_status($sentyment, $temat,  $processed) . "</th>
+                <td style='width: 110px;'><p class='fw-light fs-6 text-center'>" . $data . "</p></td>
+                <td><p class='fw-light text-center'>" . $posiedzenie . "</p></td>
+                <td>" . $kto . "</td><td>" . text_limit($tekst, 300) . "</td>
                 <td>" . $top . "</td>
-                <td align='center'>
-                    <a  href ='edit_statement.php?id=" . $id . "&". $param_link ."&strona=".$page."'>
-                    <svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#pencil-square'/></a>");
+                <td class='align-middle'>
+                    <a href ='edit_statement.php?id=" . $id . "&". $param_link ."&strona=".$page."'>
+                    <svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#pencil-square'/></a></td>
+                    <td class='align-middle'>");
                 if(get_status($sentyment, $temat, $processed) == 0){
-                    echo "<a  href='index.php?id=".$id."&".$param_link."&strona=".$page."&delete=1' class='text-danger'><svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#trash'/></a>";
+                    echo "<a href='index.php?id=".$id."&".$param_link."&strona=".$page."&delete=1' class='text-danger'><svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#trash'/></a>";
                 }
           echo ("</td>
           </tr>");
@@ -361,8 +307,8 @@
     $conn->close();
 }
     ?>
-
-        </div>
+    </div>
+    </div>
     </div>
 </body>
 
