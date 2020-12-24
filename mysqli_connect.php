@@ -2,7 +2,7 @@
     define('DB_USER', 'root');
     define('DB_PASSWORD', 'rootR98&5');
     define('DB_HOST', 'localhost');
-    define('DB_NAME', 'sejm_kopia');
+    define('DB_NAME', 'sejm');
 
     try {
         $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);

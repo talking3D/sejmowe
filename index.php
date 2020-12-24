@@ -205,6 +205,7 @@
         $qry_params = parse_params($params);
         $stmt->bind_param('ssssss', ...$qry_params );
         $stmt->execute();
+        $stmt->store_result();
         $stmt->bind_result($count);
         $stmt->fetch();
         //$conn = new mysqli("localhost", "root", "rootR98&5", "sejm_kopia");
@@ -218,6 +219,7 @@
         if($stmt = $conn->prepare($updateqry)){
             $stmt->bind_param('i', $id_get);
             $stmt->execute();
+            $stmt->store_result();
         }
     }
     //create placeholder
@@ -227,6 +229,7 @@
         $qry_params = parse_params($params);
         $stmt->bind_param('ssssss', ...$qry_params );
         $stmt->execute();
+        $stmt->store_result();
     } else {
           echo "statement could not be executed";
     }

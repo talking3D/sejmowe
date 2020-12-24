@@ -65,6 +65,7 @@
         if($stmt = $conn->prepare($checkqry)) {
             $stmt->bind_param('i', $id);
             $stmt->execute();
+            $stmt->store_result();
             $stmt->bind_result($posiedzenie, $data, $kto, $tekst, $strona, $top, $processed, $sent_id, $fragment, $temat, $sent_sent);
             $stmt->fetch();
 
@@ -73,6 +74,7 @@
             if($stmt = $conn->prepare($update_posiedzenia)) {
                 $stmt->bind_param('ssii', $tekst_form, $top_form, $processed_form, $id);
                 $stmt->execute();
+                $stmt->store_result();
             } 
             if($delete != 1){
                 if((is_null($temat) && is_null($fragment) && is_null($sent_sent)) && ($sent_sent_form != '' || $sent_temat_form != '' || $sent_tekst_form != '') && $sent_sent_form != '999') {
@@ -80,12 +82,14 @@
                     if($stmt = $conn->prepare($insert_sentyment)) {
                         $stmt->bind_param('issii', $id, $sent_tekst_form, $sent_temat_form, $sent_sent_form, $_SESSION['user']);
                         $stmt->execute();
+                        $stmt->store_result();
                     }
                 } elseif($sent_sent_form != '' || $sent_temat_form != '' || $sent_tekst_form != '') { 
                     $update_sentyment = "UPDATE sentyment SET tekst = ?, temat = ?, sentyment = ?, userid = ? WHERE id = ?;";
                     if($stmt = $conn->prepare($update_sentyment)) {
                         $stmt->bind_param('ssiii', $sent_tekst_form, $sent_temat_form, $sent_sent_form, $_SESSION['user'], $sent_id_form);
                         $stmt->execute();
+                        $stmt->store_result();
                     }
                 }
             } else {
@@ -93,7 +97,8 @@
                 if($stmt = $conn->prepare($delqry)) {
                     $stmt->bind_param('i', $sent_id_form);
                     $stmt->execute();
-                    $conn = get_connection();
+                    $stmt->store_result();
+                    //$conn = get_connection();
                 }
 
             }
@@ -107,6 +112,7 @@
         if($stmt = $conn->prepare($selqry)) {
             $stmt->bind_param('i', $id);
             $stmt->execute();
+            $stmt->store_result();
             $stmt->bind_result($posiedzenie, $data, $kto, $tekst, $strona, $top, $processed, $sent_id, $fragment, $temat, $sent_sent);
         }
         
