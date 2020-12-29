@@ -49,6 +49,7 @@
             $processed_form = $_POST['include'];
             (($sent_sent_form == '' &&  ($sent_temat_form != '' || $sent_tekst_form != '')) || ($sent_temat_form == '' && $sent_sent_form != '')) ? $sent_sent_form = 999 : $sent_sent_form;
             $processed_form == '' ? $processed_form = 0 : $processed_form = 1;
+            $source = $_POST['source'];
         
         } elseif(isset($_GET['id'])) {
             $id = $_GET['id'];
@@ -59,6 +60,7 @@
             $data_link = $_GET['year'];
             $processed_link = $_GET['processed'];
             $page = $_GET['strona'];
+            $source = $_GET['source'];
         }
         $checkqry = "SELECT p.posiedzenie, p.data, p.kto, p.tekst, p.strona, p.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id WHERE p.id = ?";
         if(isset($_POST['id'])){
@@ -141,7 +143,13 @@
         <form action="edit_statement.php" method="POST" class="py-4">
             <div class="row align-items-center justify-content-between py-3 border rounded bg-light">
                 <div class="col-1 text-center">
-                    <a href="<?php echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";?>"
+                    <a href="<?php 
+                    if($source == 1){
+                        echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";
+                    }elseif($source == 2) {
+                        echo "sentymenty.php?strona=$page";
+                    }
+                    ?>"
                         class="btn btn-primary">Wróć</a>
                 </div>
                 <div class="col-2 g-2">
@@ -212,7 +220,13 @@
                 </div>
                 <div class="row py-4 justify-content-between">
                     <div class="col-2 g-3">
-                        <a href="<?php echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";?>"
+                        <a href="<?php
+                        if($source == 1){
+                            echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";
+                        }elseif($source == 2) {
+                            echo "sentymenty.php?strona=$page";
+                        }
+                        ?>"
                             class="btn btn-primary align-middle">Wróć</a>
                     </div>
                     <div class="col-3 d-grid">
@@ -229,6 +243,7 @@
                     <input type="hidden" name="sent-id" value="<?php echo $sent_id;?>">
                     <input type="hidden" name="strona" value="<?php echo $page;?>">
                     <input type="hidden" name="processed" value="<?php echo $processed_link;?>">
+                    <input type="hidden" name="source" value="<?php echo $source;?>">
                     <!-- <input type="hidden" name="include_link" value="<?php echo $processed_;?>"> -->
             </div>
         </form>

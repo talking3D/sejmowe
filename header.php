@@ -21,7 +21,7 @@
 ?>
 <div class="row justify-content-between border border-1 rounded">
     <nav class="navbar navbar-light bg-light">
-        <div class="col-4">
+        <div class="col-7 text-start">
             <?php get_button($_SERVER['SCRIPT_NAME']); ?>
         </div>
         <div class="col-4 text-end">

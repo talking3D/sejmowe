@@ -295,7 +295,7 @@
                 <td>" . $kto . "</td><td>" . text_limit($tekst, 300) . "</td>
                 <td>" . $top . "</td>
                 <td class='align-middle'>
-                    <a href ='edit_statement.php?id=" . $id . "&". $param_link ."&strona=".$page."'>
+                    <a href ='edit_statement.php?id=" . $id . "&". $param_link ."&&source=1&strona=".$page."'>
                     <svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#pencil-square'/></a></td>
                     <td class='align-middle'>");
                 if(get_status($sentyment, $temat, $processed) == 0){

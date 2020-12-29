@@ -7,6 +7,7 @@
  }
  require("mysqli_connect.php");
  require("functions.php");
+ 
 
 
 ?>
@@ -46,16 +47,18 @@
     $cntqry = "SELECT COUNT(*) FROM sentyment";
     if($stmt = $conn->prepare($cntqry)){
         $stmt->execute();
+        $stmt->store_result();
         $stmt->bind_result($count);
         $stmt->fetch();
     }
 
     $conn = get_connection();
-    $limit = 20;
+    $limit = 10;
     $select = "SELECT id, pos_tekst_id, tekst, temat, sentyment FROM sentyment LIMIT ?";
     if($stmt = $conn->prepare($select)){
         $stmt->bind_param('i', $limit);
         $stmt->execute();
+        $stmt->store_result();
         $stmt->bind_result($id, $tekst_id, $tekst, $temat, $sentyment);
     }
     ?>
@@ -84,7 +87,7 @@
                 <td class='align-middle h5'>".$temat."</td>
                 <td>".$tekst."</td>
                 <td class='align-middle text-center'>
-                    <a href ='edit_statement.php?id=" . $tekst_id . "&". $param_link ."&strona=".$page."'>
+                    <a href ='edit_statement.php?id=" . $tekst_id . "&". $param_link ."&strona=".$page."&source=2'>
                     <svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#pencil-square'/></a></td>
             </tr>
         ");

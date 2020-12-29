@@ -50,7 +50,7 @@
     ?>
     
         <form method="post" action="login.php" name="loginform" id="loginform">
-            <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+            <img class="mb-1" src="assets/veritai_logo.png" alt="" width="200" height="200">
             <h1 class="h3 mb-3 fw-normal">Zaloguj się</h1>
             <label for="inputEmail" class="visually-hidden" name="email">Email</label>
             <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" value="<?php if (isset($_POST['email'])) echo $_POST['email']; ?> " required autofocus>
