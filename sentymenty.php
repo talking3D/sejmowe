@@ -51,12 +51,12 @@
         $stmt->bind_result($count);
         $stmt->fetch();
     }
-
     $conn = get_connection();
     $limit = 10;
-    $select = "SELECT id, pos_tekst_id, tekst, temat, sentyment FROM sentyment LIMIT ?";
+    $limit_start = (($page - 1) * $limit);
+    $select = "SELECT id, pos_tekst_id, tekst, temat, sentyment FROM sentyment LIMIT ?, ?";
     if($stmt = $conn->prepare($select)){
-        $stmt->bind_param('i', $limit);
+        $stmt->bind_param('ii', $limit_start, $limit);
         $stmt->execute();
         $stmt->store_result();
         $stmt->bind_result($id, $tekst_id, $tekst, $temat, $sentyment);
