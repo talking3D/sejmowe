@@ -101,6 +101,7 @@
                         <option value="0" <?php echo ($processed_to_form == 0 ? " selected" : "");?>>wszystkie</option>
                         <option value="1" <?php echo ($processed_to_form == 1 ? " selected" : "");?>>istotne</option>
                         <option value="2" <?php echo($processed_to_form == 2 ? " selected" : "");?>>sentyment</option>
+                        <option value="3" <?php echo($processed_to_form == 3 ? " selected" : "");?>>bez sentymentu</option>
                     </select>
                 </div>
                 <div class="col-1">
@@ -129,7 +130,7 @@
         function get_status($sentyment, $temat, $processed) {
             if($sentyment > 1 || (isset($temat) && $temat !=='' && (!isset($sentyment) || $sentyment === '' )) || (!isset($temat) && isset($sentyment) && $sentyment !== '')){
                 return -1;
-            } elseif(($processed === 1  || $processed === 2) && isset($sentyment)) {
+            } elseif(($processed === 1  || $processed === 2 || $processed === 3) && isset($sentyment)) {
                 return 1;
             }  elseif($processed === 1){
                 return 0;
@@ -156,11 +157,24 @@
         'processed' => $processed,
         //'delete' => $delete    
     );
+    if($processed == 3){
+        $params['s.sentyment'] = 'NULL';
+    }
+
     //$params['processed'] == 2 ? $params['processed'] = 1 : $params;
     //echo "paramsy: ". $params['processed'];
+
+    function no_sentyment($param){
+        if(isset($param)){
+            return " and s.sentyment is null ";
+        }
+    }
     function query_constructor($params, $limit, $page, $join = 'LEFT'){
         $where = '';
         foreach($params as $param => $value){
+            if($param == 's.sentyment'){
+                continue;
+            }
             if (in_array($param, array("YEAR(data)", "kto", "p.tekst", "top"))){
                 $param_clause = $param . " like ?";
             } elseif($value == '') {
@@ -175,7 +189,7 @@
             }
         }
         if($limit != 0) {
-                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.tekst, p.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where .  "  ORDER BY p.data DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
+                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.tekst, p.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
             } else {
             $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where;
         }
@@ -186,8 +200,9 @@
     
     function parse_params($params) {
         $values = array();
-        if($params['processed'] == 2){
+        if($params['processed'] == 2 || $params['processed'] == 3){
             $params['processed'] = 1;
+            unset($params['s.sentyment']);
         }
         foreach($params as $param=>$value) {
             if($param == 'delete'){continue;}
@@ -197,6 +212,9 @@
             array_push($values, $value);
         }
         return $values;
+    }
+    foreach(parse_params($params) as $param => $value){
+        echo $param ."=>". $value; 
     }
 
     //get count of all rows returned by query
