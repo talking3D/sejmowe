@@ -54,7 +54,7 @@
     $conn = get_connection();
     $limit = 10;
     $limit_start = (($page - 1) * $limit);
-    $select = "SELECT id, pos_tekst_id, tekst, temat, sentyment FROM sentyment LIMIT ?, ?";
+    $select = "SELECT id, pos_tekst_id, tekst, temat, sentyment FROM sentyment ORDER BY id DESC LIMIT ?, ?";
     if($stmt = $conn->prepare($select)){
         $stmt->bind_param('ii', $limit_start, $limit);
         $stmt->execute();
