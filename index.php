@@ -213,9 +213,7 @@
         }
         return $values;
     }
-    foreach(parse_params($params) as $param => $value){
-        echo $param ."=>". $value; 
-    }
+
 
     //get count of all rows returned by query
     $conn = get_connection();
