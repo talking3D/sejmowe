@@ -152,7 +152,7 @@
                     ?>"
                         class="btn btn-primary">Wróć</a>
                 </div>
-                <div class="col-2 g-2">
+                <div class="col-2 g-1">
                     Posiedzenie: <span class="h4"><?php echo $posiedzenie; ?></span>
                 </div>
                 <div class="col-2 g-2">
@@ -161,7 +161,7 @@
                 <div class="col-4 g-2">
                     Kto: <span class="h4"><?php echo $kto; ?></span>
                 </div>
-                <div class="col-2 g-2">
+                <div class="col-2">
                     <?php 
                     if(get_status($sent_sent, $temat, $processed) == -1 || get_status($sent_sent, $temat, $processed) == 1){
                         echo "<input class='form-check-input' type='checkbox' id='include' name='include-for-display' value='1' checked disabled>";
@@ -173,6 +173,9 @@
                     }
                 ?>
                     <label for="include" class="form-check-label">Istotne</label>
+                </div>
+                <div class="col-1 g-1">
+                    <button class="btn btn-danger" style="line-height: 4em;">Zapisz</button>
                 </div>
             </div>
             <div class="row align-items-center justify-content-between py-2 mt-1 border rounded bg-light">
