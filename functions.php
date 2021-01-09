@@ -71,4 +71,6 @@
         return $pags;
     }
 
+    function check_multiform($fragment, $temat, $sentyment){
+    }
 ?>
