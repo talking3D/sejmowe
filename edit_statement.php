@@ -75,6 +75,10 @@
             $processed_link = $_GET['processed'];
             $page = $_GET['strona'];
             $source = $_GET['source'];
+            $stekst = $_GET['tekst'];
+            $author = $_GET['autor'];
+            $sentyment = $_GET['sentyment'];
+            $stemat = $_GET['temat'];
         }
     
 
@@ -293,7 +297,7 @@
                         if($source == 1){
                             echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";
                         }elseif($source == 2) {
-                            echo "sentymenty.php?strona=$page";
+                            echo "sentymenty.php?strona=$page&tekst=$stekst&temat=$stemat&sentyment=$sentyment&autor=$author#$sent_id";
                         }
                         ?>"
                             class="btn btn-primary align-middle">Wróć</a>

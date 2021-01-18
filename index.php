@@ -120,13 +120,6 @@
         <div class="row">
             <?php
 
-        function sanitizeString($var){
-            $var = stripslashes($var);
-            $var = strip_tags($var); 
-            $var = htmlentities($var); 
-            return $var;
-        }
-
         function get_status($sentyment, $temat, $processed) {
             if($sentyment > 1 || (isset($temat) && $temat !=='' && (!isset($sentyment) || $sentyment === '' )) || (!isset($temat) && isset($sentyment) && $sentyment !== '')){
                 return -1;
