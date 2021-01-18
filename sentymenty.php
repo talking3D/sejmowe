@@ -54,12 +54,12 @@
     $conn = get_connection();
     $limit = 10;
     $limit_start = (($page - 1) * $limit);
-    $select = "SELECT id, pos_tekst_id, tekst, temat, sentyment FROM sentyment ORDER BY id DESC LIMIT ?, ?";
+    $select = "SELECT s.id, s.pos_tekst_id, s.tekst, s.temat, s.sentyment, u.first_name FROM sentyment s JOIN users u ON s.userid = u.userid ORDER BY id DESC LIMIT ?, ?";
     if($stmt = $conn->prepare($select)){
         $stmt->bind_param('ii', $limit_start, $limit);
         $stmt->execute();
         $stmt->store_result();
-        $stmt->bind_result($id, $tekst_id, $tekst, $temat, $sentyment);
+        $stmt->bind_result($id, $tekst_id, $tekst, $temat, $sentyment, $user);
     }
     ?>
     <div class="container">
@@ -75,7 +75,8 @@
                 <tr class='text-center'>
                     <th class='col-1'>sentyment</th>
                     <th class='col-4'>temat</th>
-                    <th class='col-6'>tekst</th>
+                    <th class='col-5'>tekst</th>
+                    <th class='col-1'>kto</th>
                     <th class='col-1'>akcja</th>
                 </tr>
             </thead>
@@ -85,9 +86,10 @@
             <tr>
                 <td class='align-middle text-center'>".get_sentyment($sentyment)."</td>
                 <td class='align-middle h5'>".$temat."</td>
-                <td>".$tekst."</td>
+                <td>".text_limit($tekst, 300)."</td>
+                <td  class='align-middle text-center'>".$user."</td>
                 <td class='align-middle text-center'>
-                    <a href ='edit_statement.php?id=" . $tekst_id . "&". $param_link ."&strona=".$page."&source=2'>
+                    <a href ='edit_statement.php?id=" . $tekst_id . "&". $param_link ."&strona=".$page."&source=2#".$id."'>
                     <svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#pencil-square'/></a></td>
             </tr>
         ");
