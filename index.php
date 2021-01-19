@@ -120,13 +120,6 @@
         <div class="row">
             <?php
 
-        function sanitizeString($var){
-            $var = stripslashes($var);
-            $var = strip_tags($var); 
-            $var = htmlentities($var); 
-            return $var;
-        }
-
         function get_status($sentyment, $temat, $processed) {
             if($sentyment > 1 || (isset($temat) && $temat !=='' && (!isset($sentyment) || $sentyment === '' )) || (!isset($temat) && isset($sentyment) && $sentyment !== '')){
                 return -1;
@@ -252,14 +245,6 @@
     $stmt->bind_result($id, $data, $posiedzenie, $kto, $tekst, $top, $sent_tekst, $temat, $sentyment, $processed);
     
 
-    
-    function text_limit($text, $max_chars)  {
-        if (strlen($text) > $max_chars) {
-            return substr($text, 0, $max_chars) . "[...]";
-        } else {
-            return $text;
-        }
-        }
     function print_status($sentyment, $temat, $processed) {
         if($sentyment > 1 || ($temat !== '' && $sentyment === '') || ($temat ==='' && $sentyment !== '')){
             return "<span class='text-danger'><svg class='bi' width='24' height='24' fill='currentColor'><use xlink:href='bootstrap-icons.svg#exclamation-circle-fill'/><span>";

@@ -73,4 +73,17 @@
 
     function check_multiform($fragment, $temat, $sentyment){
     }
+    function text_limit($text, $max_chars)  {
+        if (strlen($text) > $max_chars) {
+            return substr($text, 0, $max_chars) . "[...]";
+        } else {
+            return $text;
+        }
+        }
+        function sanitizeString($var){
+            $var = stripslashes($var);
+            $var = strip_tags($var); 
+            $var = htmlentities($var); 
+            return $var;
+        }
 ?>

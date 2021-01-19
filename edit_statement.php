@@ -75,6 +75,10 @@
             $processed_link = $_GET['processed'];
             $page = $_GET['strona'];
             $source = $_GET['source'];
+            $stekst = $_GET['tekst'];
+            $author = $_GET['autor'];
+            $sentyment = $_GET['sentyment'];
+            $stemat = $_GET['temat'];
         }
     
 
@@ -222,9 +226,12 @@
                     <textarea class="form-control" id="text" name="tekst" rows="20"><?php echo $tekst; ?></textarea>
                 </div>
             </div>
-            <?php while($stmt2->fetch()){ ?>
-            <div class="row align-items-center justify-content-between py-3 mt-1 border rounded bg-light mt-5">
+            <?php while($stmt2->fetch()){ 
+                $cnt = $cnt + 1;
+                ?>
+            <div class="row align-items-center justify-content-between py-3 mt-1 border rounded bg-light mt-5" id="<?php echo $sent_id ?>">
                 <div class="col-11">
+                    <span class="badge rounded-pill bg-secondary"><?php echo $cnt ?></span>
                     <label for="text-part" class="form-label text-secondary">Wypowiedź do oceny sentymentu</label>
                     <textarea class="form-control" id="text-part" name="tekst-fragment[]"
                         rows="7"><?php echo $fragment?></textarea>
@@ -290,7 +297,7 @@
                         if($source == 1){
                             echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";
                         }elseif($source == 2) {
-                            echo "sentymenty.php?strona=$page";
+                            echo "sentymenty.php?strona=$page&tekst=$stekst&temat=$stemat&sentyment=$sentyment&autor=$author#$sent_id";
                         }
                         ?>"
                             class="btn btn-primary align-middle">Wróć</a>
