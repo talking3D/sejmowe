@@ -309,6 +309,7 @@
             </div>
             
                     <input type="hidden" name="id" value="<?php echo $id;?>">
+                    <input type="hidden" name="posiedzenie" value="<?php echo $posiedzenie_link;?>">
                     <input type="hidden" name="year" value="<?php echo $data_link;?>">
                     <input type="hidden" name="kto" value="<?php echo $kto_link;?>">
                     <input type="hidden" name="top-words-link" value="<?php echo $top_link;?>">
