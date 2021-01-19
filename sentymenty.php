@@ -43,7 +43,7 @@
         $author = $_GET['autor'];
     }
     $tekst = "%$tekst%";
-    $temat = "%$temat";
+    $temat = "%$temat%";
 
     $params = array('tekst' => $tekst, 'temat' => $temat, 'sentyment' => $sent, 'autor' => $author);
     function get_sentyment($sentyment){
