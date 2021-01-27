@@ -41,6 +41,7 @@
         $temat = $_GET['temat'];
         $sent = $_GET['sentyment'];
         $author = $_GET['autor'];
+        $sent_id = $_GET['sent_id'];
     }
     $tekst = "%$tekst%";
     $temat = "%$temat%";
@@ -159,7 +160,7 @@
                 <td>".text_limit($tekst, 300)."</td>
                 <td  class='align-middle text-center'>".$user."</td>
                 <td class='align-middle text-center'>
-                    <a href ='edit_statement.php?id=" . $tekst_id . "&". get_param_link($params) ."&strona=".$page."&source=2#".$id."'>
+                    <a href ='edit_statement.php?id=" . $tekst_id . "&". get_param_link($params) ."&sent_id=".$id."&strona=".$page."&source=2#".$id."'>
                     <svg class='bi' width='25' height='25' fill='currentColor'><use xlink:href='bootstrap-icons.svg#pencil-square'/></a></td>
             </tr>
         ");

@@ -182,7 +182,7 @@
             }
         }
         if($limit != 0) {
-                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.tekst, p.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
+                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.tekst, p.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data ASC, day(p.data) DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
             } else {
             $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where;
         }

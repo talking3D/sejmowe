@@ -46,6 +46,7 @@
             $data_link = $_POST['year'];
             $kto_link = $_POST['kto'];
             $sent_id_form = $_POST['sent-id']; #array
+            $sent_id_link = $_POST['sent_id_link'];
             $sent_tekst_form = $_POST['tekst-fragment']; #array
             $sent_temat_form = $_POST['temat']; #array
             $sent_sent_form = $_POST['sentyment']; #array
@@ -73,6 +74,7 @@
             $kto_link = $_GET['kto'];
             $data_link = $_GET['year'];
             $processed_link = $_GET['processed'];
+            $sent_id_link = $_GET['sent_id'];
             $page = $_GET['strona'];
             $source = $_GET['source'];
             $stekst = $_GET['tekst'];
@@ -297,7 +299,7 @@
                         if($source == 1){
                             echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";
                         }elseif($source == 2) {
-                            echo "sentymenty.php?strona=$page&tekst=$stekst&temat=$stemat&sentyment=$sentyment&autor=$author#$sent_id";
+                            echo "sentymenty.php?strona=$page&tekst=$stekst&temat=$stemat&sentyment=$sentyment&sent_id=$sent_id_link&autor=$author#$sent_id_link";
                         }
                         ?>"
                             class="btn btn-primary align-middle">Wróć</a>
@@ -314,7 +316,7 @@
                     <input type="hidden" name="kto" value="<?php echo $kto_link;?>">
                     <input type="hidden" name="top-words-link" value="<?php echo $top_link;?>">
                     <input type="hidden" name="tekst-link" value="<?php echo $tekst_link;?>">
-                    <!-- <input type="hidden" name="sent-id" value="<?php echo $sent_id;?>"> -->
+                    <input type="hidden" name="sent_id_link" value="<?php echo $sent_id_link;?>">
                     <input type="hidden" name="strona" value="<?php echo $page;?>">
                     <input type="hidden" name="processed" value="<?php echo $processed_link;?>">
                     <input type="hidden" name="source" value="<?php echo $source;?>">
