@@ -18,6 +18,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/y3tju8n168doii9zmy8qg7dio1hyz2xejyn8wx7is4aylneo/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    
+    <script>
+    tinymce.init({
+        selector: '.tiny-mce-full',
+        menubar: 'edit view format',
+        height: 600
+      });
+      tinymce.init({
+        selector: '.tiny-mce-part',
+        menubar: 'edit view format',
+        height: 400
+      });
+    </script>
+
     
     <title>Edytuj wypowiedzi</title>
 </head>
@@ -225,7 +240,7 @@
             <div class="row align-items-center justify-content-between py-3 mt-1 border rounded bg-light">
                 <div class="col">
                     <label for="tekst" class="col-sm-2 col-form-label text-secondary">Tekst</label>
-                    <textarea class="form-control" id="text" name="tekst" rows="20"><?php echo $tekst; ?></textarea>
+                    <textarea class="form-control tiny-mce-full" id="text" name="tekst" rows="20"><?php echo $tekst; ?></textarea>
                 </div>
             </div>
             <?php while($stmt2->fetch()){ 
@@ -235,7 +250,7 @@
                 <div class="col-11">
                     <span class="badge rounded-pill bg-secondary"><?php echo $cnt ?></span>
                     <label for="text-part" class="form-label text-secondary">Wypowiedź do oceny sentymentu</label>
-                    <textarea class="form-control" id="text-part" name="tekst-fragment[]"
+                    <textarea class="form-control tiny-mce-part" id="text-part" name="tekst-fragment[]"
                         rows="7"><?php echo $fragment?></textarea>
                 </div>
                 <input type="hidden" name="sent-id[]" value="<?php echo $sent_id;?>">
@@ -268,7 +283,7 @@
                 <div class="row align-items-center justify-content-between py-3 mt-1 border rounded border-4 bg-light mt-5">
                 <div class="col-12">
                     <label for="text-part" class="form-label">Wypowiedź do oceny sentymentu</label>
-                    <textarea class="form-control" id="text-part" name="tekst-fragment[new]"
+                    <textarea class="form-control tiny-mce-part" id="text-part" name="tekst-fragment[new]"
                         rows="7"></textarea>
                 </div>
                 
