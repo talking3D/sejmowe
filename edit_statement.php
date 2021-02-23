@@ -24,11 +24,13 @@
     tinymce.init({
         selector: '.tiny-mce-full',
         menubar: 'edit view format',
+        content_style: '.speaker { font-weight: bold; }' + '.asside { color: gray; }',
         height: 600
       });
       tinymce.init({
         selector: '.tiny-mce-part',
         menubar: 'edit view format',
+        content_style: '.speaker { font-weight: bold; }' + '.asside { color: gray; }',
         height: 400
       });
     </script>
@@ -99,7 +101,7 @@
         }
     
 
-        $checkqry = "SELECT p.posiedzenie, p.data, p.kto, p.tekst, p.strona, p.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id WHERE p.id = ?";
+        $checkqry = "SELECT p.posiedzenie, p.data, p.kto, p.text_css, t.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id LEFT JOIN top t on pos_tekst_id = p.id WHERE p.id = ?";
         if(isset($_POST['id'])){
         
         if($stmt = $conn->prepare($checkqry)) {
@@ -161,13 +163,13 @@
             }
            
         #$selqry = "SELECT p.posiedzenie, p.data, p.kto, p.tekst, p.strona, p.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id WHERE p.id = ?";
-        $pos_gry = "SELECT posiedzenie, data, kto, tekst, strona, top, processed FROM posiedzenia WHERE id = ?";
+        $pos_gry = "SELECT p.posiedzenie, p.data, p.kto, p.text_css, t.top, p.processed FROM posiedzenia p LEFT JOIN top t on t.pos_tekst_id = p.id WHERE id = ?";
         if($stmt1 = $conn->prepare($pos_gry)) {
         
             $stmt1->bind_param('i', $id);
             $stmt1->execute();
             $stmt1->store_result();
-            $stmt1->bind_result($posiedzenie, $data, $kto, $tekst, $strona, $top, $processed);
+            $stmt1->bind_result($posiedzenie, $data, $kto, $tekst, $top, $processed);
         }
         $sent_qry = "SELECT id, tekst as fragment, temat, sentyment FROM sentyment WHERE pos_tekst_id = ?";
         if($stmt2 = $conn->prepare($sent_qry)) {
