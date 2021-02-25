@@ -101,65 +101,66 @@
         }
     
 
-        $checkqry = "SELECT p.posiedzenie, p.data, p.kto, p.text_css, t.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id LEFT JOIN top t on pos_tekst_id = p.id WHERE p.id = ?";
+        $checkqry = "SELECT p.posiedzenie, p.data, p.kto, p.text_css, t.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE p.id = ?";
         if(isset($_POST['id'])){
-        
-        if($stmt = $conn->prepare($checkqry)) {
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $stmt->store_result();
-            $stmt->bind_result($posiedzenie, $data, $kto, $tekst, $strona, $top, $processed, $sent_id, $fragment, $temat, $sent_sent);
-            $stmt->fetch();
-            $update_posiedzenia = "UPDATE posiedzenia SET tekst = ?, top = ?, processed = ? WHERE id = ?;";
-            $conn = get_connection();
-            if($stmt = $conn->prepare($update_posiedzenia)) {
-                $stmt->bind_param('ssii', $tekst_form, $top_form, $processed_form, $id);
+            if($stmt = $conn->prepare($checkqry)) {
+                $stmt->bind_param('i', $id);
                 $stmt->execute();
                 $stmt->store_result();
-            }
-            //print_r($sent_sent_form);
-            // print_r("Temat: $temat fragment: $fragment" );
-            foreach(array_keys($sent_sent_form) as $key){
-                //if($delete[$key] !== ''){
-                    if($key === 'new'){
-                        if(($sent_sent_form['new'] != '' || $sent_temat_form['new'] != '' || $sent_tekst_form['new'] != '') && 
-                        ($sent_sent_form['new'] != '999') && $sent_temat_form['new'] != ''){
-                        $insert_sentyment = "INSERT INTO sentyment (pos_tekst_id, tekst, temat, sentyment, userid) VALUES (?, ?, ?, ?, ?)";
-                        if($stmt = $conn->prepare($insert_sentyment)) {
-                            $stmt->bind_param('issii', $id, $sent_tekst_form['new'], $sent_temat_form['new'], $sent_sent_form['new'], $_SESSION['user']);
-                            $stmt->execute();
-                            $stmt->store_result();
-                        }
-                     } else {
-                            ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong class="h4">Wystąpił błąd w danych! Zmiany nie zostały zapisane.</strong><hr />Sprawdź, czy uzupełnione zostały pola <em><u>Sentyment</u></em> oraz <em><u>Temat</u></em>. Spróbuj ponownie zapisać zmiany.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            <?php
-                        }
-                    } elseif($sent_sent_form[$key] != '' || $sent_temat_form[$key] != '' || $sent_tekst_form[$key] != '') { 
-                        $update_sentyment = "UPDATE sentyment SET tekst = ?, temat = ?, sentyment = ?, userid = ? WHERE id = ?;";
-                        if($stmt = $conn->prepare($update_sentyment)) {
-                            $stmt->bind_param('ssiii', $sent_tekst_form[$key], $sent_temat_form[$key], $sent_sent_form[$key], $_SESSION['user'], $sent_id_form[$key]);
-                            $stmt->execute();
-                            $stmt->store_result();
-                        }
-                    }
-                //} else {
-                    foreach($delete as $del_key){
-                        $delqry = "DELETE FROM sentyment WHERE sentyment.id = ?";
-                            if($stmt = $conn->prepare($delqry)) {
-                                $stmt->bind_param('i', $del_key);
+                $stmt->bind_result($posiedzenie, $data, $kto, $tekst, $top, $processed, $sent_id, $fragment, $temat, $sent_sent);
+                $stmt->fetch();
+                if (is_null($top)) {
+                    //tutaj powinna się znaleźć akcja aktualizująca (insertująca) top words
+                }
+                $update_posiedzenia = "UPDATE posiedzenia SET text_css = ?, processed = ? WHERE id = ?;";
+                if($stmt = $conn->prepare($update_posiedzenia)) {
+                    $stmt->bind_param('sii', $tekst_form, $processed_form, $id);
+                    $stmt->execute();
+                    $stmt->store_result();
+                }
+                //print_r($sent_sent_form);
+                // print_r("Temat: $temat fragment: $fragment" );
+                foreach(array_keys($sent_sent_form) as $key){
+                    //if($delete[$key] !== ''){
+                        if($key === 'new'){
+                            if(($sent_sent_form['new'] != '' || $sent_temat_form['new'] != '' || $sent_tekst_form['new'] != '') && 
+                            ($sent_sent_form['new'] != '999') && $sent_temat_form['new'] != ''){
+                            $insert_sentyment = "INSERT INTO sentyment (pos_tekst_id, tekst, temat, sentyment, userid) VALUES (?, ?, ?, ?, ?)";
+                            if($stmt = $conn->prepare($insert_sentyment)) {
+                                $stmt->bind_param('issii', $id, $sent_tekst_form['new'], $sent_temat_form['new'], $sent_sent_form['new'], $_SESSION['user']);
                                 $stmt->execute();
                                 $stmt->store_result();
-                                // $conn = get_connection();
+                            }
+                        } else {
+                                ?>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong class="h4">Wystąpił błąd w danych! Zmiany nie zostały zapisane.</strong><hr />Sprawdź, czy uzupełnione zostały pola <em><u>Sentyment</u></em> oraz <em><u>Temat</u></em>. Spróbuj ponownie zapisać zmiany.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                <?php
+                            }
+                        } elseif($sent_sent_form[$key] != '' || $sent_temat_form[$key] != '' || $sent_tekst_form[$key] != '') { 
+                            $update_sentyment = "UPDATE sentyment SET tekst = ?, temat = ?, sentyment = ?, userid = ? WHERE id = ?;";
+                            if($stmt = $conn->prepare($update_sentyment)) {
+                                $stmt->bind_param('ssiii', $sent_tekst_form[$key], $sent_temat_form[$key], $sent_sent_form[$key], $_SESSION['user'], $sent_id_form[$key]);
+                                $stmt->execute();
+                                $stmt->store_result();
                             }
                         }
-                        //}
-                        $conn = get_connection();
-                    }
-            }
+                    //} else {
+                        foreach($delete as $del_key){
+                            $delqry = "DELETE FROM sentyment WHERE sentyment.id = ?";
+                                if($stmt = $conn->prepare($delqry)) {
+                                    $stmt->bind_param('i', $del_key);
+                                    $stmt->execute();
+                                    $stmt->store_result();
+                                    // $conn = get_connection();
+                                }
+                            }
+                            //}
+                            $conn = get_connection();
+                        }
+                }
             }
            
         #$selqry = "SELECT p.posiedzenie, p.data, p.kto, p.tekst, p.strona, p.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id WHERE p.id = ?";
