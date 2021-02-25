@@ -286,8 +286,12 @@
     
 
     
-    make_pagination($page, $count, $limit, $params);
-    $param_link = get_param_link($params);
+    make_pagination($page, $count, $limit, map_params($params));
+    $param_link = get_param_link(map_params($params));
+    echo $param_link."\n";
+    foreach($params as $param => $value){
+        echo "$param => $value";
+    }
     ?>
     <div class="container border border-1 rounded">
     <?php
@@ -322,7 +326,7 @@
           </tr>");
     }
     echo "</tbody></table>";
-    make_pagination($page, $count, $limit, $params);
+    make_pagination($page, $count, $limit, map_params($params));
     $stmt->close();
     $conn->close();
 }
