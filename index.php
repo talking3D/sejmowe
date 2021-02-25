@@ -46,7 +46,7 @@
         $get = true;
         $id_get = $_GET['id'];
     }
-
+    
     if (isset($_POST["posiedzenie"])){ 
         $posiedzenie = sanitize_filter($_POST['posiedzenie']);
         $year = sanitize_filter($_POST["year"]);
@@ -55,6 +55,9 @@
         $top = sanitize_filter($_POST["top"]);
         $processed = sanitize_filter($_POST["include"]);
         $post = true;
+    }
+    if ($top == ''){
+        $top = 'NULL';
     }
     $processed_to_form = $processed;
 
@@ -142,14 +145,19 @@
     if($post || $get){
 
     $params = array(
-        'posiedzenie' => $posiedzenie, 
-        'YEAR(data)' =>$year, 
-        'kto' => $kto, 
-        'p.tekst' => $tekst, 
-        'top' => $top, 
-        'processed' => $processed,
+        'p.posiedzenie' => $posiedzenie, 
+        'YEAR(p.data)' =>$year, 
+        'p.kto' => $kto, 
+        'p.text_css' => $tekst, 
+        't.top' => $top, 
+        'p.processed' => $processed,
         //'delete' => $delete    
     );
+
+    if($top == 'NULL'){
+        unset($params['t.top']);
+    }
+
     if($processed == 3){
         $params['s.sentyment'] = 'NULL';
     }
@@ -168,8 +176,12 @@
             if($param == 's.sentyment'){
                 continue;
             }
-            if (in_array($param, array("YEAR(data)", "kto", "p.tekst", "top"))){
+            if (in_array($param, array("YEAR(data)", "p.kto", "p.text_css", "t.top"))){
+                if($param == "t.top" and $value == 'NULL'){
+                    $param_clause = $param . " is NULL";
+                } else {
                 $param_clause = $param . " like ?";
+                }
             } elseif($value == '') {
                 $param_clause = $param . " like ?";
             } else {
@@ -182,15 +194,13 @@
             }
         }
         if($limit != 0) {
-                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.tekst, p.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data ASC, day(p.data) DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
+                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.text_css, t.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data ASC, day(p.data) DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
             } else {
-            $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id WHERE " . $where;
+            $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where;
         }
         return $query;
     }
     //echo query_constructor($params, $limit, $page, $join);
-    
-    
     function parse_params($params) {
         $values = array();
         if($params['processed'] == 2 || $params['processed'] == 3){
@@ -199,27 +209,32 @@
         }
         foreach($params as $param=>$value) {
             if($param == 'delete'){continue;}
-            if (in_array($param, array("YEAR(data)", "kto", "p.tekst", "top")) OR $value == ''){
+            if (in_array($param, array("YEAR(data)", "p.kto", "p.text_css", "t.top")) OR $value == ''){
                 $value = "%$value%";
             }
             array_push($values, $value);
         }
         return $values;
     }
+    function get_params_string($params){
+        return str_repeat('s', count($params));
+        }
 
 
     //get count of all rows returned by query
     $conn = get_connection();
     if ($stmt = $conn->prepare(query_constructor($params, 0, $page, $join))) {
         $qry_params = parse_params($params);
-        $stmt->bind_param('ssssss', ...$qry_params );
+        $stmt->bind_param(get_params_string($params), ...$qry_params );
         $stmt->execute();
         $stmt->store_result();
         $stmt->bind_result($count);
         $stmt->fetch();
-        //$conn = new mysqli("localhost", "root", "rootR98&5", "sejm_kopia");
+        //$conn = new mysqli("localhost", "root", "rootR98&5", "sejm_orka_all");
+        //echo (query_constructor($params, 0, $page, $join));
     } else {
-          echo "statement coud not be executed in counter";
+          echo "statement coud not be executed in counter\n";
+        //   echo (query_constructor($params, 0, $page, $join));
     }
 
     if($delete==1){
@@ -236,9 +251,10 @@
     $conn = get_connection();
     if ($stmt = $conn->prepare(query_constructor($params, $limit, $page, $join))) {
         $qry_params = parse_params($params);
-        $stmt->bind_param('ssssss', ...$qry_params );
+        $stmt->bind_param(get_params_string($params), ...$qry_params );
         $stmt->execute();
         $stmt->store_result();
+        // echo(query_constructor($params, $limit, $page, $join));
     } else {
           echo "statement could not be executed";
     }
@@ -270,8 +286,12 @@
     
 
     
-    make_pagination($page, $count, $limit, $params);
-    $param_link = get_param_link($params);
+    make_pagination($page, $count, $limit, map_params($params));
+    $param_link = get_param_link(map_params($params));
+    echo $param_link."\n";
+    foreach($params as $param => $value){
+        echo "$param => $value";
+    }
     ?>
     <div class="container border border-1 rounded">
     <?php
@@ -306,7 +326,7 @@
           </tr>");
     }
     echo "</tbody></table>";
-    make_pagination($page, $count, $limit, $params);
+    make_pagination($page, $count, $limit, map_params($params));
     $stmt->close();
     $conn->close();
 }

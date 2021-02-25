@@ -1,4 +1,22 @@
 <?php
+    function map_params($params){
+        $mapper = array(
+        // $mapped_params = array();
+        'p.posiedzenie' => 'posiedzenie', 
+        'YEAR(p.data)' =>'YEAR(data)', 
+        'p.kto' => 'kto', 
+        'p.text_css' => 'tekst', 
+        't.top' => 'top', 
+        'p.processed' => 'processed'
+        );
+        $clear_params = array();
+        foreach($params as $param => $value){
+            $clear_params[$mapper[$param]] = $value;
+        }
+        unset($clear_params['']);
+        return $clear_params;
+    }
+
     function make_pagination($page=0, $count, $limit=20, $params){
         $pages = ceil($count/$limit);
         $active_page = $page;
