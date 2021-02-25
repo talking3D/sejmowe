@@ -254,7 +254,7 @@
         $stmt->bind_param(get_params_string($params), ...$qry_params );
         $stmt->execute();
         $stmt->store_result();
-        echo(query_constructor($params, $limit, $page, $join));
+        // echo(query_constructor($params, $limit, $page, $join));
     } else {
           echo "statement could not be executed";
     }
