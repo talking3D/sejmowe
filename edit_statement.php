@@ -58,6 +58,7 @@
             $posiedzenie_link = $_POST['posiedzenie'];
             $tekst_form= $_POST['tekst'];
             $tekst_link = $_POST['tekst-link'];
+            $stekst = $tekst_link;
             $top_form = $_POST['top-words'];
             $top_link = $_POST['top-words-link'];
             $data_link = $_POST['year'];
@@ -66,11 +67,14 @@
             $sent_id_link = $_POST['sent_id_link'];
             $sent_tekst_form = $_POST['tekst-fragment']; #array
             $sent_temat_form = $_POST['temat']; #array
+            $stemat = $_POST['temat-link'];
             $sent_sent_form = $_POST['sentyment']; #array
             $delete = $_POST['delete'];
             $page = $_POST['strona'];
             $processed_link = $_POST['processed'];
             $processed_form = $_POST['include'];
+            $sentyment = $_POST['sentyment-link'];
+            $author = $_POST['author'];
             //(($sent_sent_form == '' &&  ($sent_temat_form != '' || $sent_tekst_form != '')) || ($sent_temat_form == '' && $sent_sent_form != '')) ? $sent_sent_form = 999 : $sent_sent_form;
             $processed_form == '' ? $processed_form = 0 : $processed_form = 1;
             $source = $_POST['source'];
@@ -201,7 +205,7 @@
                     if($source == 1){
                         echo "index.php?id=$id&posiedzenie=$posiedzenie_link&year=$data_link&kto=$kto_link&tekst=$tekst_link&top=$top_link&processed=$processed_link&strona=$page";
                     }elseif($source == 2) {
-                        echo "sentymenty.php?strona=$page";
+                        echo "sentymenty.php?strona=$page&tekst=$stekst&temat=$stemat&sentyment=$sentyment&sent_id=$sent_id_link&autor=$author#$sent_id_link";
                     }
                     ?>"
                         class="btn btn-primary">Wróć</a>
@@ -338,6 +342,9 @@
                     <input type="hidden" name="strona" value="<?php echo $page;?>">
                     <input type="hidden" name="processed" value="<?php echo $processed_link;?>">
                     <input type="hidden" name="source" value="<?php echo $source;?>">
+                    <input type="hidden" name="sentyment-link" value="<?php echo $sentyment;?>">
+                    <input type="hidden" name="temat-link" value="<?php echo $stemat;?>">
+                    <input type="hidden" name="author" value="<?php echo $author;?>">
                     <!-- <input type="hidden" name="include_link" value="<?php echo $processed_;?>"> -->
             </div>
         </form>
