@@ -203,8 +203,8 @@
     //echo query_constructor($params, $limit, $page, $join);
     function parse_params($params) {
         $values = array();
-        if($params['processed'] == 2 || $params['processed'] == 3){
-            $params['processed'] = 1;
+        if($params['p.processed'] == 2 || $params['p.processed'] == 3){
+            $params['p.processed'] = 1;
             unset($params['s.sentyment']);
         }
         foreach($params as $param=>$value) {
@@ -225,7 +225,7 @@
     $conn = get_connection();
     if ($stmt = $conn->prepare(query_constructor($params, 0, $page, $join))) {
         $qry_params = parse_params($params);
-        $stmt->bind_param(get_params_string($params), ...$qry_params );
+        $stmt->bind_param(get_params_string($qry_params), ...$qry_params );
         $stmt->execute();
         $stmt->store_result();
         $stmt->bind_result($count);
@@ -249,9 +249,10 @@
     //create placeholder
 
     $conn = get_connection();
+
     if ($stmt = $conn->prepare(query_constructor($params, $limit, $page, $join))) {
         $qry_params = parse_params($params);
-        $stmt->bind_param(get_params_string($params), ...$qry_params );
+        $stmt->bind_param(get_params_string($qry_params), ...$qry_params );
         $stmt->execute();
         $stmt->store_result();
         // echo(query_constructor($params, $limit, $page, $join));
@@ -259,8 +260,6 @@
           echo "statement could not be executed";
     }
     $stmt->bind_result($id, $data, $posiedzenie, $kto, $tekst, $top, $sent_tekst, $temat, $sentyment, $processed);
-    
-
     function print_status($sentyment, $temat, $processed) {
         if($sentyment > 1 || ($temat !== '' && $sentyment === '') || ($temat ==='' && $sentyment !== '')){
             return "<span class='text-danger'><svg class='bi' width='24' height='24' fill='currentColor'><use xlink:href='bootstrap-icons.svg#exclamation-circle-fill'/><span>";
