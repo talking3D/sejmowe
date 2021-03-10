@@ -168,7 +168,7 @@
             }
            
         #$selqry = "SELECT p.posiedzenie, p.data, p.kto, p.tekst, p.strona, p.top, p.processed, s.id, s.tekst as fragment, s.temat, s.sentyment FROM posiedzenia p LEFT JOIN sentyment s on s.pos_tekst_id = p.id WHERE p.id = ?";
-        $pos_gry = "SELECT p.posiedzenie, p.data, p.kto, p.text_css, t.top, p.processed FROM posiedzenia p LEFT JOIN top t on t.pos_tekst_id = p.id WHERE id = ?";
+        $pos_gry = "SELECT p.posiedzenie, p.data, p.kto, p.text_css, t.top, p.processed FROM posiedzenia p LEFT JOIN top t on t.pos_tekst_id = p.id WHERE p.id = ?";
         if($stmt1 = $conn->prepare($pos_gry)) {
         
             $stmt1->bind_param('i', $id);
