@@ -68,6 +68,7 @@
     } elseif($processed == 2) {
         $join = '';
         //$processed = '';
+    
     } else {
         $join = 'LEFT';
     }
@@ -196,8 +197,9 @@
         if($limit != 0) {
                 $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.text_css, t.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data ASC, day(p.data) DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
             } else {
-            $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where;
+            $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params['s.sentyment']);
         }
+
         return $query;
     }
     //echo query_constructor($params, $limit, $page, $join);
