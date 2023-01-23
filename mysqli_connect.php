@@ -12,7 +12,6 @@
         }
     }
     catch(Exception $e) {
-        //print "Wystąpił wyjątek: ". $e->getMessage();
         print("Wyjątkowo... spróbuj później, gdyż: ". $e->getMessage());
     }
     catch(Throwable $e){

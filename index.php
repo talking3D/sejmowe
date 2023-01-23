@@ -29,7 +29,6 @@
     function sanitize_filter($post_val){
         return filter_var($post_val, FILTER_SANITIZE_STRING);
     }
-
     $conn = get_connection();
     if(!isset($processed)){$processed = 1;};
     if(!isset($_GET['strona'])){
@@ -56,7 +55,7 @@
         $processed = sanitize_filter($_POST["include"]);
         $post = true;
     }
-    if ($top == ''){
+    if (isset($top) && $top == ''){
         $top = 'NULL';
     }
     $processed_to_form = $processed;
@@ -67,7 +66,6 @@
 
     } elseif($processed == 2) {
         $join = '';
-        //$processed = '';
     
     } else {
         $join = 'LEFT';
@@ -143,7 +141,7 @@
     $limit = 20;
     
     
-    if($post || $get){
+    if(isset($post) || isset($get)) {
 
     $params = array(
         'p.posiedzenie' => $posiedzenie, 
@@ -166,8 +164,8 @@
     //$params['processed'] == 2 ? $params['processed'] = 1 : $params;
     //echo "paramsy: ". $params['processed'];
 
-    function no_sentyment($param){
-        if(isset($param)){
+    function no_sentyment($params){
+        if(isset($params['s.sentyment'])){
             return " and s.sentyment is null ";
         }
     }
@@ -194,10 +192,11 @@
                 $where = $where ." and " . $param_clause;
             }
         }
+
         if($limit != 0) {
-                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.text_css, t.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params['s.sentyment']). "  ORDER BY p.data ASC, day(p.data) DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
+                $query = "SELECT p.id, p.data, p.posiedzenie, p.kto, p.text_css, t.top, s.tekst, s.temat, s.sentyment, p.processed FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params). "  ORDER BY p.data ASC, day(p.data) DESC, p.posiedzenie ASC, p.id ASC LIMIT ". (($page - 1) * $limit) .", " .$limit;
             } else {
-            $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params['s.sentyment']);
+            $query = "SELECT COUNT(p.id) FROM posiedzenia p ".$join." JOIN sentyment s ON p.id = s.pos_tekst_id LEFT JOIN top t on t.pos_tekst_id = p.id WHERE " . $where . no_sentyment($params);
         }
 
         return $query;
@@ -239,7 +238,7 @@
         //   echo (query_constructor($params, 0, $page, $join));
     }
 
-    if($delete==1){
+    if(isset($delete) && $delete==1){
         $conn = get_connection();
         $updateqry = "UPDATE posiedzenia SET processed = 0 WHERE id = ?";
         if($stmt = $conn->prepare($updateqry)){
